@@ -486,9 +486,9 @@ def _get_backend_service():
     
     if lp and lpp:
         # if lp and lpp is set, prioritize using them as the backend service url.
-        if lpp == 80:
+        if str(lpp) == "80":
             return f"http://{lp}"
-        elif lpp == 443:
+        elif str(lpp) == "443":
             return f"https://{lp}"
         else:
             return f"http://{lp}:{lpp}"

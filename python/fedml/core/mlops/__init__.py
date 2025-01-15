@@ -14,7 +14,6 @@ import requests
 import fedml
 from fedml import constants
 from fedml.computing.scheduler.comm_utils import sys_utils
-from fedml.computing.scheduler.slave.base_slave_protocol_manager import FedMLBaseSlaveProtocolManager
 from fedml.core.mlops.mlops_configs import MLOpsConfigs
 from .mlops_constants import MLOpsConstants
 
@@ -1254,7 +1253,7 @@ def bind_simulation_device(args, userid):
     else:
         setattr(args, "log_file_dir", ClientConstants.get_log_file_dir())
         setattr(args, "device_id", FedMLAccountManager.get_device_id())
-        runner = FedMLBaseSlaveProtocolManager(args)
+        runner = FedMLSlaveProtocolManager(args)
     setattr(args, "config_version", version)
     setattr(args, "cloud_region", "")
 
