@@ -479,20 +479,26 @@ def _get_backend_service():
     # from inspect import getframeinfo, stack
     # caller = getframeinfo(stack()[1][0])    
     # print(f"{caller.filename}:{caller.lineno} - _get_backend_service. version = {version}")
-    if version == "local":
-        port = int(get_local_on_premise_platform_port())
-        if port == 80:
-            return f"http://{get_local_on_premise_platform_host()}"
-        elif port == 443:
-            return f"https://{get_local_on_premise_platform_host()}"
+    
+    lp = get_local_on_premise_platform_host()
+    lpp = get_local_on_premise_platform_port()
+    print(f"get_backend_service lp:{lp}, lpp:{lpp}")
+    
+    if lp and lpp:
+        # if lp and lpp is set, prioritize using them as the backend service url.
+        if lpp == 80:
+            return f"http://{lp}"
+        elif lpp == 443:
+            return f"https://{lp}"
         else:
-            return f"http://{get_local_on_premise_platform_host()}:{port}"
-    elif version == "dev":
-        return FEDML_BACKEND_SERVICE_URL_DEV
-    elif version == "test":
-        return FEDML_BACKEND_SERVICE_URL_TEST
+            return f"http://{lp}:{lpp}"
     else:
-        return FEDML_BACKEND_SERVICE_URL_RELEASE
+        if version == "dev":
+            return FEDML_BACKEND_SERVICE_URL_DEV
+        elif version == "test":
+            return FEDML_BACKEND_SERVICE_URL_TEST
+        else:
+            return FEDML_BACKEND_SERVICE_URL_RELEASE
 
 
 def _get_mqtt_service():

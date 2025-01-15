@@ -14,6 +14,7 @@ import requests
 import fedml
 from fedml import constants
 from fedml.computing.scheduler.comm_utils import sys_utils
+from fedml.computing.scheduler.slave.base_slave_protocol_manager import FedMLBaseSlaveProtocolManager
 from fedml.core.mlops.mlops_configs import MLOpsConfigs
 from .mlops_constants import MLOpsConstants
 
@@ -1253,7 +1254,7 @@ def bind_simulation_device(args, userid):
     else:
         setattr(args, "log_file_dir", ClientConstants.get_log_file_dir())
         setattr(args, "device_id", FedMLAccountManager.get_device_id())
-        runner = FedMLSlaveProtocolManager(args)
+        runner = FedMLBaseSlaveProtocolManager(args)
     setattr(args, "config_version", version)
     setattr(args, "cloud_region", "")
 
@@ -1280,8 +1281,9 @@ def bind_simulation_device(args, userid):
             continue
 
     if config_try_count >= 5:
-        logging.info("\nNote: Internet is not connected. "
-                     "Experimental tracking results will not be synchronized to the MLOps (open.fedml.ai).\n")
+        url = fedml._get_backend_service()
+        logging.info(f"\nNote: Internet is not connected. "
+                     f"Experimental tracking results will not be synchronized to the MLOps ({url}).\n")
         return False
 
     # Build unique device id
@@ -1359,8 +1361,9 @@ def fetch_config(args, version="release"):
             continue
 
     if config_try_count >= 5:
-        logging.info("\nNote: Internet is not connected. "
-                     "Experimental tracking results will not be synchronized to the MLOps (open.fedml.ai).\n")
+        url = fedml._get_backend_service()
+        logging.info(f"\nNote: Internet is not connected. "
+                     f"Experimental tracking results will not be synchronized to the MLOps ({url}).\n")
         return False
 
 

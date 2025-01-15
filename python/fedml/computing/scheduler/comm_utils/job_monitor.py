@@ -152,17 +152,9 @@ class JobMonitor(Singleton):
                         continue
 
                     # Should scale in / out
-                    curr_version = fedml.get_env_version()
-
-                    if curr_version == "release":
-                        mlops_prefix = "https://open.fedml.ai/"
-                    elif curr_version == "test":
-                        mlops_prefix = "https://open-test.fedml.ai/"
-                    else:
-                        logging.error(f"Do not support the version {curr_version}.")
-                        continue
+                    mlops_prefix = fedml._get_backend_service()
                     autoscale_url_path = "fedmlModelServer/api/v1/endpoint/auto-scale"
-                    url = f"{mlops_prefix}{autoscale_url_path}"
+                    url = f"{mlops_prefix}/{autoscale_url_path}"
 
                     # Get cached token for authorization of autoscale request
                     cached_token = fedml_model_cache.get_end_point_token(e_id, e_name, model_name)

@@ -4,7 +4,7 @@ import click
 
 from fedml.computing.scheduler.comm_utils import sys_utils
 from fedml.computing.scheduler.slave.client_diagnosis import ClientDiagnosis
-
+import fedml
 
 def diagnose(open, s3, mqtt, mqtt_daemon, mqtt_s3_backend_server, mqtt_s3_backend_client,
              mqtt_s3_backend_run_id):
@@ -33,10 +33,11 @@ def diagnose(open, s3, mqtt, mqtt_daemon, mqtt_s3_backend_server, mqtt_s3_backen
 
     if check_open:
         is_open_connected = ClientDiagnosis.check_open_connection()
+        url = fedml._get_backend_service()  
         if is_open_connected:
-            click.echo("The connection to https://open.fedml.ai is OK.")
+            click.echo(f"The connection to {url} is OK.")
         else:
-            click.echo("You can not connect to https://open.fedml.ai.")
+            click.echo(f"You can not connect to {url}.")
 
     if check_s3:
         is_s3_connected = ClientDiagnosis.check_s3_connection()
