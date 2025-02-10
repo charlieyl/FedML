@@ -10,6 +10,7 @@ import multiprocessing
 import psutil
 
 from fedml.computing.scheduler.comm_utils import sys_utils
+from fedml.computing.scheduler.comm_utils.job_utils import JobRunnerUtils
 from .device_info_report_protocol import FedMLDeviceInfoReportProtocol
 from .mlops_utils import MLOpsUtils
 from .system_stats import SysStats
@@ -127,7 +128,7 @@ class MLOpsDevicePerfStats(object):
                 self.monitor_run_master_process.start()
 
     def report_device_realtime_stats_entry(self, sys_event, role, is_client=False):
-        # print(f"Report device realtime stats, process id {os.getpid()}")
+        logging.info(f"Report device realtime stats, role {role}, is_client {is_client}, process id {os.getpid()}")
 
         self.device_realtime_stats_event = sys_event
         mqtt_mgr = MqttManager(
@@ -225,14 +226,17 @@ class MLOpsDevicePerfStats(object):
     def report_gpu_device_info(edge_id, mqtt_mgr=None):
         total_mem, free_mem, total_disk_size, free_disk_size, cup_utilization, cpu_cores, gpu_cores_total, \
             gpu_cores_available, sent_bytes, recv_bytes, gpu_available_ids = sys_utils.get_sys_realtime_stats()
+        logging.info(f"report_gpu_device_info gpu_available_ids{gpu_available_ids} from realtime stats ")
 
         topic_name = "ml_client/mlops/gpu_device_info"
 
         # We should report realtime available gpu count to MLOps, not from local redis cache.
         # Use gpu_available_ids from sys_utils.get_sys_realtime_stats()
         # Do not use the following two lines as the realtime available gpu ids.
-        # gpu_available_ids = JobRunnerUtils.get_available_gpu_id_list(edge_id)
-        # gpu_available_ids = JobRunnerUtils.trim_unavailable_gpu_ids(gpu_available_ids)
+        gpu_available_ids_from_cache = JobRunnerUtils.get_available_gpu_id_list(edge_id)
+        gpu_available_ids_from_cache_trimmed = JobRunnerUtils.trim_unavailable_gpu_ids(gpu_available_ids_from_cache)
+        logging.info(f"report_gpu_device_info gpu_available_ids_from_cache {gpu_available_ids_from_cache}, gpu_available_ids_from_cache_trimmed {gpu_available_ids_from_cache_trimmed}")
+
         gpu_cores_available = len(gpu_available_ids) if gpu_available_ids is not None else 0
         deploy_worker_id_list = list()
         try:
